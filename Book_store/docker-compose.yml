@@ -1,0 +1,27 @@
+services:
+  bookstore:
+    image: bookstore-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"   # Changed host port to 5000 to avoid conflicts
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80 # Ensure the app listens on port 80 inside the container
+      - ConnectionStrings__DefaultConnection=Server=JOE;Database=BookstoreDB;User=sa;Password=Password123!
+    depends_on:
+      - sqlserver
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password123!
+    ports:
+      - "1433:1433"  # Map SQL Server port 1433
+    volumes:
+      - sql_data:/var/opt/mssql  # Persist SQL Server data
+
+volumes:
+  sql_data:
